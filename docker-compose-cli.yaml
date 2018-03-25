@@ -10,43 +10,51 @@ networks:
 
 services:
 
-  orderer.example.com:
+  orderer.myorderer.com:
     extends:
       file:   base/docker-compose-base.yaml
-      service: orderer.example.com
-    container_name: orderer.example.com
+      service: orderer.myorderer.com
+    container_name: orderer.myorderer.com
     networks:
       - byfn
 
-  peer0.org1.example.com:
-    container_name: peer0.org1.example.com
+  peer0.org1.supplier.com:
+    container_name: peer0.org1.supplier.com
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer0.org1.example.com
+      service: peer0.org1.supplier.com
     networks:
       - byfn
 
-  peer1.org1.example.com:
-    container_name: peer1.org1.example.com
+  peer0.org2.buyer.com:
+    container_name: peer0.org2.buyer.com
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer1.org1.example.com
+      service: peer0.org2.buyer.com
     networks:
       - byfn
 
-  peer0.org2.example.com:
-    container_name: peer0.org2.example.com
+  peer1.org2.buyer.com:
+    container_name: peer1.org2.buyer.com
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer0.org2.example.com
+      service: peer1.org2.buyer.com
     networks:
       - byfn
 
-  peer1.org2.example.com:
-    container_name: peer1.org2.example.com
+  peer0.org3.supplier.com:
+    container_name: peer0.org2.buyer.com
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer1.org2.example.com
+      service: peer0.org2.buyer.com
+    networks:
+      - byfn
+
+  peer1.org2.buyer.com:
+    container_name: peer1.org2.buyer.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.org2.buyer.com
     networks:
       - byfn
 
