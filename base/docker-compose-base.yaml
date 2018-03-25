@@ -1,0 +1,127 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer.example.com:
+    container_name: orderer.myorderer.com
+    image: hyperledger/fabric-orderer
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+    - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+    - ../crypto-config/ordererOrganizations/myorderer.com/orderers/orderer.myorderer.com/msp:/var/hyperledger/orderer/msp
+    - ../crypto-config/ordererOrganizations/myorderer.com/orderers/orderer.myorderer.com/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 7050:7050
+
+  peer0.org1.example.com:
+    container_name: peer0.org1.supplier.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org1.supplier.com
+      - CORE_PEER_ADDRESS=peer0.org1.supplier.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.supplier.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.supplier.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/org1.supplier.com/peers/peer0.org1.supplier.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/org1.supplier.com/peers/peer0.org1.supplier.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer0.org2.example.com:
+    container_name: peer0.org2.buyer.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org2.buyer.com
+      - CORE_PEER_ADDRESS=peer0.org2.buyer.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.buyer.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.buyer.com:7051
+      - CORE_PEER_LOCALMSPID=Org2MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/org2.buyer.com/peers/peer0.org2.buyer.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/org2.buyer.com/peers/peer0.org2.buyer.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 9051:7051
+      - 9053:7053
+
+  peer1.org2.example.com:
+    container_name: peer1.org2.buyer.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.org2.buyer.com
+      - CORE_PEER_ADDRESS=peer1.org2.buyer.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.buyer.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.buyer.com:7051
+      - CORE_PEER_LOCALMSPID=Org2MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/org2.buyer.com/peers/peer1.org2.buyer.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/org2.buyer.com/peers/peer1.org2.buyer.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 10051:7051
+      - 10053:7053
+
+  peer0.org3.example.com:
+    container_name: peer0.org3.logistic.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org3.logistic.com
+      - CORE_PEER_ADDRESS=peer0.org3.logistic.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3.logistic.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org3.logistic.com:7051
+      - CORE_PEER_LOCALMSPID=Org3MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/org3.logistic.com/peers/peer0.org3.logistic.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/org3.logistic.com/peers/peer0.org3.logistic.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 11051:7051
+      - 11053:7053
+
+  peer1.org3.example.com:
+    container_name: peer1.org3.logistic.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.org3.logistic.com
+      - CORE_PEER_ADDRESS=peer1.org3.logistic.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org3.logistic.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3.logistic.com:7051
+      - CORE_PEER_LOCALMSPID=Org3MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/org3.logistic.com/peers/peer1.org3.logistic.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/org3.logistic.com/peers/peer1.org3.logistic.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 12051:7051
+      - 12053:7053
