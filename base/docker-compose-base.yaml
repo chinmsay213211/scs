@@ -7,7 +7,7 @@ version: '2'
 
 services:
 
-  orderer.example.com:
+  orderer.myorderer.com:
     container_name: orderer.myorderer.com
     image: hyperledger/fabric-orderer
     environment:
